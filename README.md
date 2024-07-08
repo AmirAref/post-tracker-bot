@@ -2,7 +2,5 @@
 clone with submodules :
 ```bash
 
-git clone --recursive https://github.com/AmirAref/post-tracker-bot
-cd post-tracker-bot
-git submodule update
+poetry run pip install git+https://github.com/AmirAref/post-tracker.git
 ```
