@@ -11,6 +11,7 @@ python = "^3.12"
 httpx = "^0.27.0"
 post-tracker = {git = "https://github.com/AmirAref/post-tracker"}
 pydantic-settings = "^2.3.4"
+python-telegram-bot = {extras = ["socks"], version = "^21.3"}
 
 
 [build-system]
