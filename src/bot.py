@@ -1,10 +1,9 @@
 from post_tracker.utils import get_tracking_post
 from post_tracker.errors import TrackingNotFoundError
 from httpx import AsyncClient
-import asyncio
 import logging
 
-from telegram import Message, Update
+from telegram import Update
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
