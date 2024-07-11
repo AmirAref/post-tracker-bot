@@ -12,6 +12,7 @@ from telegram.ext import (
     filters,
 )
 from src.settings import settings
+from src.utils import create_tracking_message
 from src import messages
 
 # ------------------------------
@@ -42,9 +43,8 @@ async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> Non
         async with AsyncClient() as client:
             # get data from post-tracker
             tracking_data = await get_tracking_post(client=client, tracking_code=code)
-        # TODO : format the output respose
         await update.message.reply_text(
-            text=tracking_data.model_dump_json(indent=2),
+            text=create_tracking_message(tracking_info=tracking_data),
             reply_to_message_id=update.message.id,
         )
     except TrackingNotFoundError:
