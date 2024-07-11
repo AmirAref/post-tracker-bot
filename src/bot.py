@@ -4,6 +4,7 @@ from httpx import AsyncClient
 import logging
 
 from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -55,7 +56,10 @@ async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> Non
         # unhandled error
         logging.exception(e)
         await update.message.reply_text(
-            text=messages.UNHANDLED_ERROR, reply_to_message_id=update.message.id
+            text=messages.UNHANDLED_ERROR,
+            reply_to_message_id=update.message.id,
+            disable_web_page_preview=True,
+            parse_mode=ParseMode.MARKDOWN,
         )
 
 
