@@ -52,6 +52,7 @@ async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> Non
         async with AsyncClient() as client:
             # get data from post-tracker
             tracking_data = await get_tracking_post(client=client, tracking_code=code)
+        # create reply keyboard markap
         keyboard = [
             [
                 InlineKeyboardButton('به روز رسانی', callback_data=update.message.text)
@@ -89,33 +90,26 @@ async def update_details_code_callbackquery(update : Update, _ : ContextTypes.DE
                 InlineKeyboardButton('به روز رسانی', callback_data= query.data)
             ]
         ]
+        # create reply keyboard markap
         reply_markup = InlineKeyboardMarkup(keyboard)
         await query.edit_message_text(
             text=create_tracking_message(tracking_info=tracking_data),
             reply_markup= reply_markup,
         )
-        print(f'tracking_data:{tracking_data}')
+        await query.answer('آخرین وضعیت مرسوله با موفقیت دریافت شد. ✅', show_alert=True )        
     except TrackingNotFoundError:
-        await query.edit_message_text(
-            text=messages.TRACKING_NOT_FOUND,
-        )
+        await query.answer(messages.TRACKING_NOT_FOUND)
+
     except error.BadRequest as e:
-        if str(e) == 'Message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message':
-            pass        
-        else:
-            logging.exception(e)
+        'Message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message'
+        await query.answer('آخرین وضعیت مرسوله تغییری نکرده است. ℹ️',show_alert=True )
+
     except Exception as e:
         # unhandled error
         print(e.__class__)
         logging.exception(e)
-        await query.edit_message_text(
-            text=messages.UNHANDLED_ERROR,
-            disable_web_page_preview=True,
-            parse_mode=ParseMode.MARKDOWN,
-        )
-    finally :
-        await query.answer()
-    
+        await query.answer('مشکلی در به روز رسانی به وجود آمده است. ❌', show_alert=True )
+
 
 if __name__ == "__main__":
     # setup bot
