@@ -19,7 +19,7 @@ UNHANDLED_ERROR = """
 
 TRACKING_STATUS = """
 📆 تاریخ : {date}
-⏰ زمان : {time.hour}:{time.minute}
+⏰ زمان : {time}
 🏣 موقعیت : {location}
 📮 وضعیت : {status}
 """
