@@ -21,9 +21,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
 
 # function handler
-async def start(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+async def start_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
-        text="سلام به ربات تلگرامی رهگیری مرسولات پستی شرکت ملی پست ایران خوش آمدید.\n برای رهگیری بسته پستی خود، لطفا کد رهگیری تان را ارسال نمایید.",
+        text=messages.START_MESSAGE,
         reply_to_message_id=update.message.id,
     )
 
@@ -31,7 +31,7 @@ async def start(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     # check the code
     code: str = update.message.text
-    if not code.isdigit() or len(code) != 24:
+    if not code.isdigit():
         # invalid code
         await update.message.reply_text(
             text=messages.INVALID_CODE, reply_to_message_id=update.message.id
