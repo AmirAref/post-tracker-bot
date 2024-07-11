@@ -3,12 +3,19 @@ from post_tracker.errors import TrackingNotFoundError
 from httpx import AsyncClient
 import logging
 
-from telegram import Update
+from telegram import (
+    Update,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    error,
+)
+
 from telegram.constants import ParseMode
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
     MessageHandler,
+    CallbackQueryHandler,
     ContextTypes,
     filters,
 )
@@ -35,7 +42,8 @@ async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> Non
     if not code.isdigit():
         # invalid code
         await update.message.reply_text(
-            text=messages.INVALID_CODE, reply_to_message_id=update.message.id
+            text=messages.INVALID_CODE,
+            reply_to_message_id=update.message.id,
         )
         return
 
@@ -44,9 +52,17 @@ async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> Non
         async with AsyncClient() as client:
             # get data from post-tracker
             tracking_data = await get_tracking_post(client=client, tracking_code=code)
+        # create reply keyboard markap
+        keyboard = [
+            [
+                InlineKeyboardButton('به روز رسانی', callback_data=update.message.text)
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text(
             text=create_tracking_message(tracking_info=tracking_data),
             reply_to_message_id=update.message.id,
+            reply_markup=reply_markup,  
         )
     except TrackingNotFoundError:
         await update.message.reply_text(
@@ -61,6 +77,38 @@ async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> Non
             disable_web_page_preview=True,
             parse_mode=ParseMode.MARKDOWN,
         )
+
+async def update_details_code_callbackquery(update : Update, _ : ContextTypes.DEFAULT_TYPE) -> None:
+    # Parses the CallbackQuery and updates the message text.
+    query = update.callback_query           
+    try:
+        async with AsyncClient() as client:
+            # get data from post-tracker
+            tracking_data = await get_tracking_post(client= client, tracking_code= query.data)
+        keyboard = [
+            [
+                InlineKeyboardButton('به روز رسانی', callback_data= query.data)
+            ]
+        ]
+        # create reply keyboard markap
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            text=create_tracking_message(tracking_info=tracking_data),
+            reply_markup= reply_markup,
+        )
+        await query.answer('آخرین وضعیت مرسوله با موفقیت دریافت شد. ✅', show_alert=True )        
+    except TrackingNotFoundError:
+        await query.answer(messages.TRACKING_NOT_FOUND)
+
+    except error.BadRequest as e:
+        'Message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message'
+        await query.answer('آخرین وضعیت مرسوله تغییری نکرده است. ℹ️',show_alert=True )
+
+    except Exception as e:
+        # unhandled error
+        print(e.__class__)
+        logging.exception(e)
+        await query.answer('مشکلی در به روز رسانی به وجود آمده است. ❌', show_alert=True )
 
 
 if __name__ == "__main__":
@@ -80,6 +128,8 @@ if __name__ == "__main__":
                 filters=filters.TEXT & filters.ChatType.PRIVATE,
                 callback=tracking_callback,
             ),
+            CallbackQueryHandler(update_details_code_callbackquery),
+
         ]
     )
 
