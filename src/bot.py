@@ -71,7 +71,7 @@ if __name__ == "__main__":
     # add handlers
     app.add_handlers(
         [
-            CommandHandler(command="start", callback=start),
+            CommandHandler(command="start", callback=start_callback),
             MessageHandler(
                 filters=filters.TEXT & filters.ChatType.PRIVATE,
                 callback=tracking_callback,
