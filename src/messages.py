@@ -23,3 +23,18 @@ TRACKING_STATUS = """
 🏣 موقعیت : {location}
 📮 وضعیت : {status}
 """
+
+ALERT_UPDATE_SUCCESS = """
+✅ آخرین وضعیت مرسوله با موفقیت دریافت شد
+"""
+
+ALERT_UPDATE_ERROR = """
+❌ مشکلی در به روز رسانی به وجود آمده است
+"""
+
+
+ALERT_UPDATE_NOT_MODIFIED = """
+ℹ️ آخرین وضعیت مرسوله تغییری نکرده است
+"""
+
+UPDATE_BUTTON_TEXT = "🔄 به‌روزرسانی"
