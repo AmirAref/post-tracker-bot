@@ -46,6 +46,11 @@ async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> Non
             reply_to_message_id=update.message.id,
         )
         return
+    # send waiting message
+    wait_msg = await update.message.reply_text(
+        text=messages.WAITING_MESSAGE,
+        reply_to_message_id=update.message.id,
+    )
 
     try:
         # TODO : inject async client as a dependency
@@ -62,21 +67,17 @@ async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> Non
             ]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text(
+        await wait_msg.edit_text(
             text=create_tracking_message(tracking_info=tracking_data),
-            reply_to_message_id=update.message.id,
             reply_markup=reply_markup,
         )
     except TrackingNotFoundError:
-        await update.message.reply_text(
-            text=messages.TRACKING_NOT_FOUND, reply_to_message_id=update.message.id
-        )
+        await wait_msg.edit_text(text=messages.TRACKING_NOT_FOUND)
     except Exception as e:
         # unhandled error
         logging.exception(e)
-        await update.message.reply_text(
+        await wait_msg.edit_text(
             text=messages.UNHANDLED_ERROR,
-            reply_to_message_id=update.message.id,
             disable_web_page_preview=True,
             parse_mode=ParseMode.MARKDOWN,
         )
