@@ -7,7 +7,7 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.11,<4"
 post-tracker = {git = "https://github.com/AmirAref/post-tracker"}
 pydantic-settings = "^2.3.4"
 python-telegram-bot = {extras = ["socks"], version = "^21.3"}
