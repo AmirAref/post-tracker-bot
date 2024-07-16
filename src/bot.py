@@ -1,7 +1,6 @@
 from post_tracker.utils import get_tracking_post
 from post_tracker.errors import TrackingNotFoundError
 from httpx import AsyncClient
-import logging
 
 from telegram import (
     Update,
@@ -21,15 +20,16 @@ from telegram.ext import (
 )
 from src.settings import settings
 from src.utils import create_tracking_message
+from src.logger import get_logger
 from src import messages
 
 # ------------------------------
-# TODO : setup custom logger
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
+logger = get_logger(name="post-tracker-bot")
 
 
 # function handler
 async def start_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+    logger.debug("start command received.")
     await update.message.reply_text(
         text=messages.START_MESSAGE,
         reply_to_message_id=update.message.id,
@@ -41,6 +41,7 @@ async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> Non
     code: str = update.message.text
     if not code.isdigit():
         # invalid code
+        logger.debug(f"invalid tracking code number : {code}")
         await update.message.reply_text(
             text=messages.INVALID_CODE,
             reply_to_message_id=update.message.id,
@@ -54,9 +55,11 @@ async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> Non
 
     try:
         # TODO : inject async client as a dependency
+        logger.info(f"start get tracking data for code : {code}")
         async with AsyncClient() as client:
             # get data from post-tracker
             tracking_data = await get_tracking_post(client=client, tracking_code=code)
+        logger.info(f"tracking data for code : {code} received successfully !")
         # create reply keyboard markap
         keyboard = [
             [
@@ -72,10 +75,11 @@ async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> Non
             reply_markup=reply_markup,
         )
     except TrackingNotFoundError:
+        logger.debug(f"tracking data for code : {code} not found !")
         await wait_msg.edit_text(text=messages.TRACKING_NOT_FOUND)
-    except Exception as e:
+    except Exception:
         # unhandled error
-        logging.exception(e)
+        logger.exception("getting tracking data raised an error :")
         await wait_msg.edit_text(
             text=messages.UNHANDLED_ERROR,
             disable_web_page_preview=True,
@@ -93,6 +97,7 @@ async def update_details_code_callbackquery(
         return
     tracking_code = query_data.split("update_")[1]
     try:
+        logger.info(f"update tracking data for code : {tracking_code}")
         async with AsyncClient() as client:
             # get data from post-tracker
             tracking_data = await get_tracking_post(
@@ -117,11 +122,14 @@ async def update_details_code_callbackquery(
 
     except error.BadRequest:
         # "Message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message"
+        logger.info(
+            "tracking state did not changed (editing the message raised Bad Request)"
+        )
         await query.answer(messages.ALERT_UPDATE_NOT_MODIFIED, show_alert=True)
 
-    except Exception as e:
+    except Exception:
         # unhandled error
-        logging.exception(e)
+        logger.exception("updating tracking data raised an error :")
         await query.answer(messages.ALERT_UPDATE_ERROR, show_alert=True)
 
 
@@ -146,5 +154,5 @@ if __name__ == "__main__":
         ]
     )
 
-    logging.info("bot starting")
+    logger.info("bot starting")
     app.run_polling()

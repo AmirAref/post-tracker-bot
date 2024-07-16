@@ -14,24 +14,16 @@ ENV POETRY_HOME='/usr/local'
 
 WORKDIR /code/
 
-
 # Install Poetry
-# https://github.com/python-poetry/poetry
-RUN curl -sSL 'https://install.python-poetry.org' | python - \
+RUN pip install poetry \
   && poetry --version
-
-
-# Add `poetry` to PATH
-ENV PATH="${PATH}:${POETRY_VENV}/bin"
 
 # install the dependencies
 COPY pyproject.toml ./
 
-# Allow installing dev dependencies to run tests
-ARG INSTALL_DEV=false
-RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-root ; else poetry install --no-dev --no-root ; fi"
-
+RUN poetry install --only main --no-root --no-directory
 
 COPY src/ ./src
+RUN poetry install --only main
 
 ENTRYPOINT ["python", "-m", "src.bot"]
