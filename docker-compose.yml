@@ -1,0 +1,29 @@
+version: "3.11"
+
+services:
+  app:
+    container_name: "post-tracker-bot"
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      - proxy
+    restart: unless-stopped
+
+  tor:
+    image: peterdavehello/tor-socks-proxy
+    expose:
+      - '9150'
+    restart: always
+
+  proxy:
+    container_name: 'glider_proxy'
+    image: nadoo/glider
+    expose:
+      - '1080'
+    command: "-config /etc/glider/glider.conf"
+    depends_on:
+      - tor
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./glider:/etc/glider
