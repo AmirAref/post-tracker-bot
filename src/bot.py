@@ -1,6 +1,5 @@
 from post_tracker.utils import get_tracking_post
 from post_tracker.errors import TrackingNotFoundError
-from httpx import AsyncClient
 
 from telegram import (
     Update,
@@ -11,6 +10,7 @@ from telegram import (
 
 from telegram.constants import ParseMode
 from telegram.ext import (
+    Application,
     ApplicationBuilder,
     CommandHandler,
     MessageHandler,
@@ -18,6 +18,7 @@ from telegram.ext import (
     ContextTypes,
     filters,
 )
+from src.deps import HTTPXClientWrapper
 from src.settings import settings
 from src.utils import create_tracking_message
 from src.logger import get_logger
@@ -54,11 +55,10 @@ async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> Non
     )
 
     try:
-        # TODO : inject async client as a dependency
         logger.info(f"start get tracking data for code : {code}")
-        async with AsyncClient() as client:
-            # get data from post-tracker
-            tracking_data = await get_tracking_post(client=client, tracking_code=code)
+        client = httpx_client_wrapper()
+        # get data from post-tracker
+        tracking_data = await get_tracking_post(client=client, tracking_code=code)
         logger.info(f"tracking data for code : {code} received successfully !")
         # create reply keyboard markap
         keyboard = [
@@ -98,11 +98,11 @@ async def update_details_code_callbackquery(
     tracking_code = query_data.split("update_")[1]
     try:
         logger.info(f"update tracking data for code : {tracking_code}")
-        async with AsyncClient() as client:
-            # get data from post-tracker
-            tracking_data = await get_tracking_post(
-                client=client, tracking_code=tracking_code
-            )
+        client = httpx_client_wrapper()
+        # get data from post-tracker
+        tracking_data = await get_tracking_post(
+            client=client, tracking_code=tracking_code
+        )
         keyboard = [
             [
                 InlineKeyboardButton(
@@ -133,6 +133,16 @@ async def update_details_code_callbackquery(
         await query.answer(messages.ALERT_UPDATE_ERROR, show_alert=True)
 
 
+async def startup_handler(_: Application) -> None:
+    logger.info("starting httpx connection pool ...")
+    httpx_client_wrapper.start()
+
+
+async def shutdown_hadnler(_: Application) -> None:
+    logger.info("stoping httpx connection pool ...")
+    await httpx_client_wrapper.stop()
+
+
 if __name__ == "__main__":
     # setup bot
     app = ApplicationBuilder().token(token=settings.bot_token)
@@ -140,6 +150,11 @@ if __name__ == "__main__":
     if settings.proxy_url is not None:
         app.proxy(proxy=settings.proxy_url)
         app.get_updates_proxy(get_updates_proxy=settings.proxy_url)
+
+    # startup and shutdown handlers
+    httpx_client_wrapper = HTTPXClientWrapper()
+    app.post_init(startup_handler)
+    app.post_shutdown(shutdown_hadnler)
     # build bot
     app = app.build()
     # add handlers
