@@ -1,10 +1,35 @@
-# Post Tracker Robot
+<html dir="rtl">
 
-# Installation :
-first clone this repo.
+# ربات رهگیری مرسولات پستی
+این یک ربات تلگرامی برای رهگیری مرسولات پستی شرکت پست ملی ایران است. به کمک این ربات می‌توانید مرسولات خود را با داشتن کد رهگیری در تلگرام رهگیری کنید و نیازی به ورود به سامانه رهگیری نخواهید داشت.  
+این ربات یک پروژه **متن‌باز** است و ارتباطی با شرکت پست ملی ایران **ندارد**.
 
-## Configuartion
-then you should set environment variables in `.env` file. so you can copy `.env-smaple` file to `.env` and write your data.
+## نحوه راه‌اندازی و اجرا
+برای راه‌اندازی ربات ، پس از clone کردن پروژه باید متغیر های های لازم را در فایل ‎`.env` تنظیم کنید ، برای این کار طبق زیر عمل کنید :
 ```bash
 cp .env-sample .env
 ```
+سپس فایل ‍‎`.env` را با editor خود باز کرده و مقادیر متغیر ها را با اطلاعات خود جایگزین کنید.  
+سپس می‌توانید ربات را به راحتی با docker اجرا کنید : 
+```bash
+docker compose up --build -d
+```
+
+
+> [!NOTE]
+> به دلیل استفاده از پروکسی **tor** جهت اجرای ربات ، ممکن است راه‌اندازی آن مدتی طول بکشد.
+
+  
+> [!NOTE]
+> توجه داشته باشید که از آنجایی که این ربات نیاز به فرستادن درخواست به سامانه رهگیری مرسولات پستی دارد و این سامانه فقط با IP **ایران** کار می‌کند ، بنابراین در حال حاضر ربات فقط بر روی **سرور های ایران** کار می‌کند.  
+
+  
+</html>  
+
+<br>  
+
+## TODO
+- [ ] write tests
+- [ ] define desired version of `post-tracker` package in poetry
+- [ ] add some **wrokflows** to **test** and **lint** the project
+- [ ] add more proxies to glider and use `Environment Variables` to load proxies.
