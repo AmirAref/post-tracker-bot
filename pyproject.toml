@@ -1,25 +1,23 @@
-[tool.poetry]
+[project]
 name = "post-tracker-bot"
 version = "0.1.0"
-description = ""
-authors = ["Amir Aref <amiraref808@gmail.com>"]
+description = "Add your description here"
+authors = [
+    { name = "Amir Aref", email = "amiraref808@gmail.com" }
+]
+dependencies = [
+    "colorlog>=6.8.2",
+    "python-telegram-bot[socks]>=21.4",
+    "pydantic-settings>=2.3.4",
+    "post-tracker @ git+https://github.com/AmirAref/post-tracker",
+]
 readme = "README.md"
-package-mode = false
-
-[project]
 requires-python = ">=3.11"
 
-[tool.poetry.dependencies]
-python = ">=3.11,<4"
-post-tracker = {git = "https://github.com/AmirAref/post-tracker"}
-pydantic-settings = "^2.3.4"
-python-telegram-bot = {extras = ["socks"], version = "^21.3"}
-colorlog = "^6.8.2"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.rye]
+managed = true
+virtual = true
+dev-dependencies = []
 
 [tool.ruff]
 target-version = "py311"
