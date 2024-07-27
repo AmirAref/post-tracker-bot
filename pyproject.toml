@@ -19,5 +19,8 @@ managed = true
 virtual = true
 dev-dependencies = []
 
+[tool.rye.scripts]
+dev = "python -m src.bot"
+
 [tool.ruff]
 target-version = "py311"

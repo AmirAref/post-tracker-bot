@@ -20,7 +20,7 @@ from telegram.ext import (
 )
 from src.deps import HTTPXClientWrapper
 from src.settings import settings
-from src.utils import create_tracking_message
+from src.utils import create_tracking_message, persian_to_en_numbers
 from src.logger import get_logger
 from src import messages
 
@@ -40,6 +40,7 @@ async def start_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 async def tracking_callback(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     # check the code
     code: str = update.message.text
+    code = persian_to_en_numbers(text=code)
     if not code.isdigit():
         # invalid code
         logger.debug(f"invalid tracking code number : {code}")

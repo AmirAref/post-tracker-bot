@@ -16,3 +16,35 @@ def create_tracking_message(tracking_info: TrackingResult) -> str:
     message = "\n------------------\n".join(messages)
 
     return message
+
+
+def persian_to_en_numbers(text: str) -> str:
+    persian = [
+        "۰",
+        "۱",
+        "۲",
+        "۳",
+        "۴",
+        "۵",
+        "۶",
+        "۷",
+        "۸",
+        "۹",
+    ]
+    english = [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+    ]
+    # convert persian to english digits
+    for i in range(len(persian)):
+        text = text.replace(persian[i], english[i])
+
+    return text
