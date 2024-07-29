@@ -35,7 +35,7 @@ markdown-it-py==3.0.0
     # via rich
 mdurl==0.1.2
     # via markdown-it-py
-post-tracker @ git+https://github.com/AmirAref/post-tracker@a08125b84a02bf65e285b4b96c39729084d12bef
+post-tracker @ git+https://github.com/AmirAref/post-tracker@2943072f972deec138e595560aa3b8b15929191e
 pydantic==2.8.2
     # via post-tracker
     # via pydantic-settings
