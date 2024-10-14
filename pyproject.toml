@@ -9,7 +9,7 @@ dependencies = [
     "colorlog>=6.8.2",
     "python-telegram-bot[socks]>=21.4",
     "pydantic-settings>=2.3.4",
-    "post-tracker @ git+https://github.com/AmirAref/post-tracker",
+    "post-tracker>=0.3.1",
 ]
 readme = "README.md"
 requires-python = ">=3.11"
@@ -20,7 +20,7 @@ virtual = true
 dev-dependencies = []
 
 [tool.rye.scripts]
-dev = "python -m src.bot"
+dev = {cmd="python -m src.bot", env-file='.env'}
 
 [tool.ruff]
 target-version = "py311"

@@ -38,6 +38,11 @@ def get_logger(
     if log_level is not None:
         logger.setLevel(log_level)
 
+    # Disable propagation to avoid duplicate logs
+    logger.propagate = False
+    # Remove all existing handlers before adding the custom one
+    if logger.hasHandlers():
+        logger.handlers.clear()
     # set logger handler and formating
     handler = logging.StreamHandler()
     handler.setFormatter(
