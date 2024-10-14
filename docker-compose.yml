@@ -27,3 +27,4 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./glider:/etc/glider
+    restart: unless-stopped
